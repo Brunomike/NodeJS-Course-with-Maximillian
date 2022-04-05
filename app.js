@@ -24,6 +24,13 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-app.listen(port, err => {
-    err ? console.log(err.message) : console.log(`Listening on http://localhost:${port}`)
-});
+db.sync()
+    .then(result => {
+        //console.log(result);
+        app.listen(port, err => {
+            err ? console.log(err.message) : console.log(`Listening on http://localhost:${port}`)
+        });
+
+    }).catch(err => {
+        console.log(err)
+    })

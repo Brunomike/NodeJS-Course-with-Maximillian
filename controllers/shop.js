@@ -2,37 +2,40 @@ const Product = require("../models/product");
 const Cart = require("../models/cart");
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll((products) => {
-    res.render("shop/product-list", {
-      prods: products,
-      docTitle: "All Products",
-      path: "/products",
-      hasProducts: products.length > 0,
-    });
-  });
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("shop/product-list", {
+        prods: rows,
+        docTitle: "All Products",
+        path: "/products",
+      });
+    })
+    .catch(err => console.log(err.message));
 };
 
 exports.getProduct = (req, res, next) => {
   const productId = req.params.productId;
-  Product.findById(productId, product => {
-    res.render("shop/product-detail", {
-      product: product,
-      docTitle: product.title,
-      path: `/products`,
-    });
-  });
-
+  Product.findById(productId)
+    .then(([product]) => {
+      res.render("shop/product-detail", {
+        product: product[0],
+        docTitle: product.title,
+        path: `/products`,
+      });
+    })
+    .catch(err => console.log(err.message));
 }
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll((products) => {
-    res.render("shop/index", {
-      prods: products,
-      docTitle: "Shop",
-      path: "/",
-      hasProducts: products.length > 0,
-    });
-  });
+  Product.fetchAll()
+    .then(([rows, fieldData]) => {
+      res.render("shop/index", {
+        prods: rows,
+        docTitle: "Shop",
+        path: "/",
+      });
+    })
+    .catch(err => console.log(err.message));
 };
 
 exports.getOrders = (req, res, next) => {
