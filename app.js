@@ -3,6 +3,7 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const logger = require("morgan");
+const mongoose=require("mongoose");
 const port = process.env.PORT || 3000;
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
+
 
 
 
