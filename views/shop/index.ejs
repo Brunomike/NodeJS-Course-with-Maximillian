@@ -24,8 +24,9 @@
           <%- include("../includes/add-to-cart.ejs",{product: product}) %> 
         </div>
       </article>
-      <% } %>
+      <% } %>      
     </div>
+    <%- include("../includes/pagination.ejs") %>
     <%} else{%>
     <h1>No Products Found!</h1>
     <% }%>
