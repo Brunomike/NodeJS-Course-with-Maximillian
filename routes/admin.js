@@ -8,7 +8,7 @@ const isAuth = require("../middleware/is-auth");
 router.get("/add-product", isAuth, adminController.getAddProduct);
 router.post("/add-product",
     [
-        check('title')
+        body('title')
             .trim()
             .isString()
             .isLength({ min: 3 })
@@ -16,10 +16,6 @@ router.post("/add-product",
         body('price')
             .isFloat()
             .withMessage('Please enter a valid decimal number'),
-        body('imageUrl')
-            .trim()
-            .isURL()
-            .withMessage('Please enter a valid url'),
         body('description')
             .trim()
             .isLength({ min: 5 })
@@ -30,17 +26,14 @@ router.get("/edit-product/:productId", isAuth, adminController.getEditProduct);
 router.post("/edit-product/",
     [
         body('title')
-        .trim()
-        .isString()
+            .trim()
+            .isString()
             .isLength({ min: 3 })
             .trim()
             .withMessage('Title should be an alphanumeric with at least 3 characters'),
         body('price')
             .isFloat()
-            .withMessage('Please enter a valid decimal number'),
-        body('imageUrl')
-            .isURL()
-            .withMessage('Please enter a valid url'),
+            .withMessage('Please enter a valid decimal number'),      
         body('description')
             .isLength({ min: 5 })
             .trim()
