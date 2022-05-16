@@ -1,7 +1,10 @@
 require("dotenv").config();
+const path = require("path");
+const fs = require('fs');
+const https = require('https');
+
 const express = require("express");
 const session = require('express-session');
-const path = require("path");
 const bodyParser = require("body-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
@@ -9,6 +12,8 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const flash = require('connect-flash');
 const csrf = require('csurf');
 const multer = require('multer');
+const helmet = require('helmet');
+const compression = require('compression');
 const port = process.env.PORT || 3000;
 
 const errorController = require("./controllers/error");
@@ -20,6 +25,10 @@ const store = new MongoDBStore({
     collection: 'sessions'
 });
 const csrfProtection = csrf();
+
+const privateKey = fs.readFileSync('server.key');
+const certificate = fs.readFileSync('server.cert');
+
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './images');
@@ -44,13 +53,19 @@ app.set('views', './views');
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require('./routes/auth');
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
+    { flags: 'a' }
+);
 
 //app.enable('view cache');
+app.use(helmet());
+app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/images',express.static(path.join(__dirname, "images")));
-app.use(logger('dev'));
+app.use('/images', express.static(path.join(__dirname, "images")));
+
+app.use(logger('dev', { stream: accessLogStream }));
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -100,8 +115,13 @@ mongoose.connect(process.env.MONGO_DB_DRIVER, {
     useUnifiedTopology: true,
 })
     .then((result) => {
-        console.log({ db: result });
-        app.listen(port, err => {
+        //console.log({ db: result });
+        // app.listen(port, err => {
+        //     if (err) console.log(err.message);
+        //     console.log(`Listening on http://localhost:${port}`);
+        // });
+
+        https.createServer({ key: privateKey, cert: certificate }, app).listen(port, err => {
             if (err) console.log(err.message);
             console.log(`Listening on http://localhost:${port}`);
         });

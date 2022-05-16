@@ -1,3 +1,7 @@
 /node_modules/
 /.env
 images/
+/server.cert
+/server.key
+/access.log
+/data/invoices/
